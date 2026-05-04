@@ -2,7 +2,7 @@
   "name": "dotenv-manager",
   "displayName": "DotEnv Manager",
   "description": "A powerful .env file formatter, linter, and manager. Sort variables, detect duplicates, mask secrets, auto-complete keys, and manage environment variables from a rich custom editor view.",
-  "version": "6.2.0",
+  "version": "6.4.2",
   "publisher": "apertacodex",
   "license": "MIT",
   "repository": {
@@ -19,31 +19,7 @@
   "categories": [
     "Formatters"
   ],
-  "keywords": [
-    "dotenv",
-    "env",
-    "environment",
-    "variables",
-    "formatter",
-    "linter",
-    "manager",
-    "secrets",
-    "configuration",
-    "config"
-  ],
-  "galleryBanner": {
-    "color": "#2d2d2d",
-    "theme": "dark"
-  },
-  "pricing": "Free",
-  "qna": "marketplace",
-  "capabilities": {
-    "untrustedWorkspaces": {
-      "supported": "limited",
-      "description": "Secret masking and read-only viewing supported in untrusted workspaces."
-    },
-    "virtualWorkspaces": true
-  },
+  "keywords": [],
   "activationEvents": [
     "onLanguage:dotenv",
     "workspaceContains:**/.env*"
@@ -88,24 +64,6 @@
         "path": "./syntaxes/dotenv.tmLanguage.json",
         "language": "dotenv",
         "scopeName": "source.dotenv"
-      }
-    ],
-    "customEditors": [
-      {
-        "viewType": "dotenvManager.envEditor",
-        "displayName": "DotEnv Manager",
-        "selector": [
-          {
-            "filenamePattern": ".env"
-          },
-          {
-            "filenamePattern": ".env.*"
-          },
-          {
-            "filenamePattern": "*.env"
-          }
-        ],
-        "priority": "option"
       }
     ],
     "configuration": {
@@ -166,6 +124,24 @@
         }
       }
     },
+    "customEditors": [
+      {
+        "viewType": "dotenvManager.envEditor",
+        "selector": [
+          {
+            "filenamePattern": ".env"
+          },
+          {
+            "filenamePattern": ".env.*"
+          },
+          {
+            "filenamePattern": "*.env"
+          }
+        ],
+        "priority": "option",
+        "displayName": "DotEnv Manager"
+      }
+    ],
     "menus": {
       "editor/context": [
         {
@@ -291,8 +267,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test",
-    "package": "vsce package"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/vscode": "^1.118.0",
@@ -303,8 +278,6 @@
     "typescript": "^5.7.0",
     "@vscode/vsce": "^3.2.0",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "ovsx": "^0.10.8"
-  },
-  "icon": "images/icon.png"
+    "@vscode/test-electron": "^2.4.1"
+  }
 }
