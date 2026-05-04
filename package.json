@@ -2,7 +2,7 @@
   "name": "dotenv-manager",
   "displayName": "DotEnv Manager",
   "description": "A powerful .env file formatter, linter, and manager. Sort variables, detect duplicates, mask secrets, auto-complete keys, and manage environment variables from a rich custom editor view.",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "publisher": "apertacodex",
   "license": "MIT",
   "repository": {
