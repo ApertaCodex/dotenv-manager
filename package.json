@@ -1,8 +1,8 @@
 {
   "name": "dotenv-manager",
   "displayName": "DotEnv Manager",
-  "description": "A powerful .env file formatter, linter, and manager. Sort variables, detect duplicates, mask secrets, auto-complete keys, and manage environment variables from a convenient sidebar panel.",
-  "version": "4.1.10",
+  "description": "A powerful .env file formatter, linter, and manager. Sort variables, detect duplicates, mask secrets, auto-complete keys, and manage environment variables from a rich custom editor view.",
+  "version": "4.5.0",
   "publisher": "apertacodex",
   "license": "MIT",
   "repository": {
@@ -19,7 +19,31 @@
   "categories": [
     "Formatters"
   ],
-  "keywords": [],
+  "keywords": [
+    "dotenv",
+    "env",
+    "environment",
+    "variables",
+    "formatter",
+    "linter",
+    "manager",
+    "secrets",
+    "configuration",
+    "config"
+  ],
+  "galleryBanner": {
+    "color": "#2d2d2d",
+    "theme": "dark"
+  },
+  "pricing": "Free",
+  "qna": "marketplace",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Secret masking and read-only viewing supported in untrusted workspaces."
+    },
+    "virtualWorkspaces": true
+  },
   "activationEvents": [
     "onLanguage:dotenv",
     "workspaceContains:**/.env*"
@@ -66,6 +90,24 @@
         "scopeName": "source.dotenv"
       }
     ],
+    "customEditors": [
+      {
+        "viewType": "dotenvManager.envEditor",
+        "displayName": "DotEnv Manager",
+        "selector": [
+          {
+            "filenamePattern": ".env"
+          },
+          {
+            "filenamePattern": ".env.*"
+          },
+          {
+            "filenamePattern": "*.env"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
     "configuration": {
       "title": "DotEnv Manager",
       "properties": {
@@ -81,7 +123,7 @@
         },
         "dotenvManager.groupByPrefix": {
           "type": "boolean",
-          "description": "Group variables by prefix (e.g., DB_, API_) in the sidebar tree.",
+          "description": "Group variables by prefix (e.g., DB_, API_) in the manager view.",
           "default": true
         },
         "dotenvManager.formatOnSave": {
@@ -124,33 +166,7 @@
         }
       }
     },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "title": "DotEnv Manager",
-          "icon": "$(symbol-key)",
-          "id": "dotenvManagerPanel"
-        }
-      ]
-    },
     "menus": {
-      "view/title": [
-        {
-          "when": "view == dotenvManagerTree",
-          "command": "dotenvManager.addVariable",
-          "group": "navigation@1"
-        },
-        {
-          "when": "view == dotenvManagerTree",
-          "command": "dotenvManager.sortVariables",
-          "group": "navigation@2"
-        },
-        {
-          "when": "view == dotenvManagerTree",
-          "command": "dotenvManager.refreshTree",
-          "group": "navigation@3"
-        }
-      ],
       "editor/context": [
         {
           "when": "resourceLangId == dotenv",
@@ -166,6 +182,11 @@
           "when": "resourceLangId == dotenv",
           "command": "dotenvManager.detectDuplicates",
           "group": "dotenv@3"
+        },
+        {
+          "when": "resourceLangId == dotenv",
+          "command": "dotenvManager.openWithManager",
+          "group": "dotenv@4"
         }
       ],
       "explorer/context": [
@@ -173,28 +194,11 @@
           "when": "resourceFilename =~ /\\.env.*/",
           "command": "dotenvManager.compareEnvFiles",
           "group": "dotenv@1"
-        }
-      ],
-      "view/item/context": [
-        {
-          "when": "view == dotenvManagerTree && viewItem == envVariable",
-          "command": "dotenvManager.editVariable",
-          "group": "inline@1"
         },
         {
-          "when": "view == dotenvManagerTree && viewItem == envVariable",
-          "command": "dotenvManager.copyValue",
-          "group": "inline@2"
-        },
-        {
-          "when": "view == dotenvManagerTree && viewItem == envVariable",
-          "command": "dotenvManager.removeVariable",
-          "group": "inline@3"
-        },
-        {
-          "when": "view == dotenvManagerTree && viewItem == envVariable",
-          "command": "dotenvManager.goToVariable",
-          "group": "context@1"
+          "when": "resourceFilename =~ /\\.env.*/",
+          "command": "dotenvManager.openWithManager",
+          "group": "dotenv@2"
         }
       ]
     },
@@ -210,6 +214,12 @@
         "command": "dotenvManager.sortVariables",
         "key": "ctrl+shift+s",
         "mac": "cmd+shift+s"
+      },
+      {
+        "when": "resourceLangId == dotenv",
+        "command": "dotenvManager.openWithManager",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m"
       }
     ],
     "commands": [
@@ -224,36 +234,6 @@
         "title": "Open Terminal with Env Vars",
         "category": "DotEnv Manager",
         "command": "dotenvManager.openTerminal"
-      },
-      {
-        "icon": "$(refresh)",
-        "title": "Refresh",
-        "category": "DotEnv Manager",
-        "command": "dotenvManager.refreshTree"
-      },
-      {
-        "icon": "$(add)",
-        "title": "Add Variable",
-        "category": "DotEnv Manager",
-        "command": "dotenvManager.addVariable"
-      },
-      {
-        "icon": "$(trash)",
-        "title": "Remove Variable",
-        "category": "DotEnv Manager",
-        "command": "dotenvManager.removeVariable"
-      },
-      {
-        "icon": "$(edit)",
-        "title": "Edit Variable",
-        "category": "DotEnv Manager",
-        "command": "dotenvManager.editVariable"
-      },
-      {
-        "icon": "$(clippy)",
-        "title": "Copy Value",
-        "category": "DotEnv Manager",
-        "command": "dotenvManager.copyValue"
       },
       {
         "icon": "$(list-ordered)",
@@ -298,35 +278,12 @@
         "command": "dotenvManager.clearDiagnostics"
       },
       {
-        "icon": "$(dashboard)",
-        "title": "Open Env Dashboard",
+        "icon": "$(notebook-open-as-text)",
+        "title": "Open with DotEnv Manager",
         "category": "DotEnv Manager",
-        "command": "dotenvManager.openWebview"
-      },
-      {
-        "icon": "$(go-to-file)",
-        "title": "Go To Variable",
-        "category": "DotEnv Manager",
-        "command": "dotenvManager.goToVariable"
+        "command": "dotenvManager.openWithManager"
       }
-    ],
-    "views": {
-      "dotenvManagerPanel": [
-        {
-          "name": "Environment Variables",
-          "icon": "$(symbol-key)",
-          "id": "dotenvManagerTree",
-          "contextualTitle": "DotEnv Manager"
-        },
-        {
-          "name": "Env Dashboard",
-          "icon": "$(dashboard)",
-          "id": "dotenvManagerWebview",
-          "contextualTitle": "DotEnv Dashboard",
-          "type": "webview"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -334,7 +291,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/vscode": "^1.118.0",
@@ -345,7 +303,8 @@
     "typescript": "^5.7.0",
     "@vscode/vsce": "^3.2.0",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "ovsx": "^0.10.8"
   },
   "icon": "images/icon.png"
 }
